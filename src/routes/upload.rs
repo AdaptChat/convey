@@ -6,6 +6,7 @@ use axum::{
     response::IntoResponse,
     Json, TypedHeader,
 };
+use futures_util::stream::TryStreamExt;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -31,7 +32,7 @@ pub async fn upload(
         let mut current_size = 0_u64;
         let mut buffer = Vec::with_capacity(1024);
 
-        while let Some(chunk) = field.chunk().await? {
+        while let Some(chunk) = field.try_next().await? {
             current_size += chunk.len() as u64;
 
             if current_size > *MAX_SIZE {
