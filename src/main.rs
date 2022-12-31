@@ -11,6 +11,12 @@ mod routes;
 async fn main() {
     drop(dotenv::dotenv());
 
+    if std::env::var("RUST_LOG").is_err() {
+        std::env::set_var("RUST_LOG", "info");
+    }
+
+    pretty_env_logger::init();
+
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .route("/upload", post(routes::upload))

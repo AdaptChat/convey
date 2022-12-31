@@ -85,7 +85,7 @@ impl From<MultipartError> for Error {
         use std::error::Error;
 
         if let Some(source) = value.source() {
-            Self::MultipartError(source.to_string())
+            Self::MultipartError(format!("{source:?}"))
         } else {
             Self::MultipartError("Unknown Error".to_string())
         }
