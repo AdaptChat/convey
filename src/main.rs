@@ -1,6 +1,6 @@
 use axum::{
     routing::{get, post},
-    Router,
+    Router, extract::DefaultBodyLimit,
 };
 
 mod config;
@@ -23,7 +23,8 @@ async fn main() {
         .route(
             "/attachments/:id/*filename",
             get(routes::download).delete(routes::delete),
-        );
+        )
+        .layer(DefaultBodyLimit::max(1024 * 1024 * 20));
 
     axum::Server::bind(&"0.0.0.0:8078".parse().unwrap())
         .serve(app.into_make_service())
