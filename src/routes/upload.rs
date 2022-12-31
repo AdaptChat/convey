@@ -1,24 +1,22 @@
+use std::fs::File;
+
 use axum::{
     extract::Multipart,
     headers::{authorization::Bearer, Authorization},
     response::IntoResponse,
-    TypedHeader,
+    Json, TypedHeader,
 };
-use highway::{HighwayHasher, Key};
-use lazy_static::lazy_static;
+use serde::Serialize;
+use uuid::Uuid;
 
 use crate::{
-    config::{AUTH, MAX_SIZE},
+    config::{AUTH, FILE_STORAGE_PATH, MAX_SIZE},
     error::{Error, Result},
 };
 
-lazy_static! {
-    static ref hasher: HighwayHasher = HighwayHasher::new(Key([
-        16129575160643678914,
-        8006219525329119735,
-        2098523345898263339,
-        540360354731526120
-    ]));
+#[derive(Serialize)]
+struct UploadInfo {
+    path: String,
 }
 
 pub async fn upload(
@@ -31,26 +29,41 @@ pub async fn upload(
 
     if let Ok(Some(mut field)) = multipart.next_field().await {
         let mut current_size = 0_u64;
-        let mut buffer = Vec::<u8>::with_capacity(1024);
+        let mut buffer = Vec::with_capacity(1024);
 
         while let Some(chunk) = field.chunk().await? {
-            let count = chunk.len();
-            current_size += count as u64;
+            current_size += chunk.len() as u64;
 
             if current_size > *MAX_SIZE {
                 return Err(Error::TooLarge);
             }
-            buffer.reserve(count);
 
-            let len = buffer.len();
-
-            unsafe {
-                std::ptr::copy_nonoverlapping(chunk.as_ptr(), buffer.as_mut_ptr().add(len), count);
-
-                buffer.set_len(len + count)
-            }
+            buffer.append(&mut chunk.to_vec());
         }
-    }
 
-    Ok(())
+        let file_name = sanitize_filename::sanitize_with_options(
+            field.file_name().ok_or(Error::MissingFilename)?,
+            sanitize_filename::Options {
+                windows: false,
+                truncate: true,
+                replacement: "_",
+            },
+        );
+
+        let id = Uuid::new_v4().to_string();
+
+        let path = tokio::task::spawn_blocking(move || -> Result<String> {
+            let path = format!("{}/{id}-{file_name}", *FILE_STORAGE_PATH);
+            let file = File::create(&path)?;
+
+            zstd::stream::copy_encode(&buffer[..], file, 10)?;
+
+            Ok(path)
+        })
+        .await??;
+
+        Ok(Json(UploadInfo { path }))
+    } else {
+        Err(Error::MissingField)
+    }
 }

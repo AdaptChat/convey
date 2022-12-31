@@ -1,5 +1,6 @@
 [package]
 name = "convey"
+authors = ["Cryptex"]
 version = "0.1.0"
 edition = "2021"
 
@@ -8,8 +9,10 @@ edition = "2021"
 [dependencies]
 axum = { version = "0.6", features = ["headers", "json", "multipart"] }
 dotenv = "0"
-highway = "0.8.1"
 lazy_static = "1"
+sanitize-filename = "0.4"
 serde = { version = "1", features = ["derive"] }
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "fs"] }
+tree_magic_mini = "3"
+uuid = { version = "1", features = ["v4", "fast-rng"] }
 zstd = "0.12"
