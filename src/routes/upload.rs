@@ -58,7 +58,7 @@ pub async fn upload(
 
             zstd::stream::copy_encode(&buffer[..], file, 10)?;
 
-            Ok(path)
+            Ok(format!("/attachments/{id}/{file_name}"))
         })
         .await??;
 

@@ -27,7 +27,9 @@ impl IntoResponse for Error {
                 StatusCode::UNAUTHORIZED,
                 ErrorJson {
                     code: 401,
-                    message: Cow::Borrowed("Not authorized, missing `Authorization` header"),
+                    message: Cow::Borrowed(
+                        "Not authorized, missing / mismatched `Authorization` header",
+                    ),
                 },
             ),
             Self::NotFound => (
@@ -79,7 +81,7 @@ impl IntoResponse for Error {
 }
 
 impl From<MultipartError> for Error {
-    fn from(value: MultipartError) -> Self {
+    fn from(_: MultipartError) -> Self {
         Self::MultipartError
     }
 }

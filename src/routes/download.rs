@@ -11,7 +11,13 @@ pub async fn download(Path((id, filename)): Path<(String, String)>) -> Result<im
     .await??;
 
     Ok((
-        [(header::CONTENT_TYPE, tree_magic_mini::from_u8(&content))],
+        [
+            (header::CONTENT_TYPE, tree_magic_mini::from_u8(&content)),
+            (
+                header::CACHE_CONTROL,
+                "public,max-age=604800,must-revalidate",
+            ),
+        ],
         content,
     ))
 }
