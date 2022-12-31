@@ -15,7 +15,7 @@ pub enum Error {
     NotFound,
     MissingField,
     MissingFilename,
-    MultipartError,
+    MultipartError(String),
     IOFailed(String),
     TooLarge,
 }
@@ -53,11 +53,11 @@ impl IntoResponse for Error {
                     message: Cow::Borrowed("Missing filename in form-data"),
                 },
             ),
-            Self::MultipartError => (
+            Self::MultipartError(e) => (
                 StatusCode::BAD_REQUEST,
                 ErrorJson {
                     code: 400,
-                    message: Cow::Borrowed("Error parsing `multipart/form-data` request"),
+                    message: Cow::Owned(format!("Error parsing `multipart/form-data` request: {e}")),
                 },
             ),
             Self::IOFailed(e) => (
@@ -81,8 +81,14 @@ impl IntoResponse for Error {
 }
 
 impl From<MultipartError> for Error {
-    fn from(_: MultipartError) -> Self {
-        Self::MultipartError
+    fn from(value: MultipartError) -> Self {
+        use std::error::Error;
+
+        if let Some(source) = value.source() {
+            Self::MultipartError(source.to_string())
+        } else {
+            Self::MultipartError("Unknown Error".to_string())
+        }
     }
 }
 
