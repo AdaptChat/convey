@@ -56,7 +56,7 @@ pub async fn upload(
             let path = format!("{}/{id}-{file_name}", *FILE_STORAGE_PATH);
             let file = File::create(&path)?;
 
-            zstd::stream::copy_encode(&buffer[..], file, 10)?;
+            zstd::stream::copy_encode(&buffer[..], file, 15)?;
 
             Ok(format!("/attachments/{id}/{file_name}"))
         })
