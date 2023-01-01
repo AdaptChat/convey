@@ -15,6 +15,7 @@ pub enum Error {
     NotFound,
     MissingField,
     MissingFilename,
+    IllegalFilename,
     MultipartError(String),
     IOFailed(String),
     TooLarge,
@@ -53,11 +54,20 @@ impl IntoResponse for Error {
                     message: Cow::Borrowed("Missing filename in form-data"),
                 },
             ),
+            Self::IllegalFilename => (
+                StatusCode::BAD_REQUEST,
+                ErrorJson {
+                    code: 400,
+                    message: Cow::Borrowed("Filename provided does not contain extension"),
+                },
+            ),
             Self::MultipartError(e) => (
                 StatusCode::BAD_REQUEST,
                 ErrorJson {
                     code: 400,
-                    message: Cow::Owned(format!("Error parsing `multipart/form-data` request: {e}")),
+                    message: Cow::Owned(format!(
+                        "Error parsing `multipart/form-data` request: {e}"
+                    )),
                 },
             ),
             Self::IOFailed(e) => (

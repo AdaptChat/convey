@@ -1,6 +1,7 @@
 use axum::{
+    extract::DefaultBodyLimit,
     routing::{get, post},
-    Router, extract::DefaultBodyLimit,
+    Router,
 };
 
 mod config;
@@ -19,11 +20,13 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
-        .route("/upload", post(routes::upload))
+        .route("/attachments", post(routes::upload))
+        .route("/avatars/:user_id", post(routes::upload_avatar))
         .route(
             "/attachments/:id/*filename",
             get(routes::download).delete(routes::delete),
         )
+        .route("/avatars/:user_id/*id", get(routes::download_avatar))
         .layer(DefaultBodyLimit::max(1024 * 1024 * 20));
 
     axum::Server::bind(&"0.0.0.0:8078".parse().unwrap())
