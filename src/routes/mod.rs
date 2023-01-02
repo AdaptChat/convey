@@ -13,7 +13,10 @@ pub use upload_avatar::upload_avatar;
 
 use serde::Serialize;
 
-use crate::{error::{Result, Error}, config::MAX_SIZE};
+use crate::{
+    config::MAX_SIZE,
+    error::{Error, Result},
+};
 
 #[derive(Serialize)]
 pub struct UploadInfo {

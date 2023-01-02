@@ -13,7 +13,7 @@ use crate::{
     error::{Error, Result},
 };
 
-use super::{UploadInfo, extract_field};
+use super::{extract_field, UploadInfo};
 
 pub async fn upload(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,

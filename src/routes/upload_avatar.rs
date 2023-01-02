@@ -13,7 +13,7 @@ use crate::{
     error::{Error, Result},
 };
 
-use super::{UploadInfo, extract_field};
+use super::{extract_field, UploadInfo};
 
 pub async fn upload_avatar(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,
@@ -27,24 +27,19 @@ pub async fn upload_avatar(
     if let Ok(Some(mut field)) = multipart.next_field().await {
         let buffer = extract_field(&mut field).await?;
 
-        let ext = sanitize_filename::sanitize_with_options(
-            field.file_name().ok_or(Error::MissingFilename)?,
-            sanitize_filename::Options {
-                windows: false,
-                truncate: true,
-                replacement: "_",
-            },
-        )
-        .split_once('.')
-        .ok_or(Error::IllegalFilename)?
-        .1
-        .to_string();
+        let ext = field
+            .file_name()
+            .ok_or(Error::MissingFilename)?
+            .rsplit_once('.')
+            .ok_or(Error::IllegalFilename)?
+            .1
+            .to_string();
 
         let id = Uuid::new_v4().to_string();
 
         let path = tokio::task::spawn_blocking(move || -> Result<String> {
             let path = format!("{}/{user_id}", *FILE_STORAGE_PATH);
-            drop(fs::remove_dir(&path));
+            drop(fs::remove_dir_all(&path));
             fs::create_dir(&path)?;
 
             let path = format!("{}/{user_id}/{id}.{ext}", *FILE_STORAGE_PATH);
