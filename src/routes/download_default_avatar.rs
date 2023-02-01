@@ -62,13 +62,13 @@ pub async fn download_default_avatar(
             .encode(ImageFormat::Png, &mut buffer)
             .map_err(|_| Error::EncodingFailed)?;
 
-        Ok(zstd::stream::decode_all(&*buffer)?)
+        Ok(buffer)
     })
     .await??;
 
     Ok((
         [
-            (header::CONTENT_TYPE, tree_magic_mini::from_u8(&content)),
+            (header::CONTENT_TYPE, "image/png"),
             (
                 header::CACHE_CONTROL,
                 "public,max-age=604800,must-revalidate",
