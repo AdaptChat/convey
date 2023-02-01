@@ -27,6 +27,10 @@ async fn main() {
             get(routes::download).delete(routes::delete),
         )
         .route("/avatars/:user_id/*id", get(routes::download_avatar))
+        .route(
+            "/avatars/:user_id/default.png",
+            get(routes::download_default_avatar),
+        )
         .layer(DefaultBodyLimit::max(1024 * 1024 * 20));
 
     axum::Server::bind(&"0.0.0.0:8078".parse().unwrap())
