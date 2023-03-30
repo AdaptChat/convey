@@ -18,7 +18,9 @@ pub enum Error {
     IllegalFilename,
     MultipartError(String),
     IOFailed(String),
+    EncodingFailed,
     TooLarge,
+    InvalidAvatarSize,
 }
 
 impl IntoResponse for Error {
@@ -82,6 +84,20 @@ impl IntoResponse for Error {
                 ErrorJson {
                     code: 413,
                     message: Cow::Borrowed("Attachment is too large"),
+                },
+            ),
+            Self::EncodingFailed => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorJson {
+                    code: 500,
+                    message: Cow::Borrowed("Failed to encode image"),
+                },
+            ),
+            Self::InvalidAvatarSize => (
+                StatusCode::BAD_REQUEST,
+                ErrorJson {
+                    code: 400,
+                    message: Cow::Borrowed("Avatar size should be between 64 and 512"),
                 },
             ),
         };

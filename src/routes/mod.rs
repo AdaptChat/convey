@@ -1,6 +1,7 @@
 mod delete;
 mod download;
 mod download_avatar;
+mod download_default_avatar;
 mod upload;
 mod upload_avatar;
 
@@ -8,6 +9,7 @@ use axum::extract::multipart::Field;
 pub use delete::delete;
 pub use download::download;
 pub use download_avatar::download_avatar;
+pub use download_default_avatar::download_default_avatar;
 pub use upload::upload;
 pub use upload_avatar::upload_avatar;
 
