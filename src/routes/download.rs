@@ -1,14 +1,10 @@
 use axum::{extract::Path, http::header, response::IntoResponse};
 
-use crate::{config::FILE_STORAGE_PATH, error::Result};
+use crate::{error::Result, storage};
 
-pub async fn download(Path((id, filename)): Path<(String, String)>) -> Result<impl IntoResponse> {
-    let content = tokio::task::spawn_blocking(move || -> Result<Vec<u8>> {
-        let file = std::fs::File::open(format!("{}/{id}-{filename}", *FILE_STORAGE_PATH))?;
-
-        Ok(zstd::stream::decode_all(file)?)
-    })
-    .await??;
+pub async fn download(Path((id, file_name)): Path<(String, String)>) -> Result<impl IntoResponse> {
+    let file_name = format!("/attachments/{id}/{file_name}");
+    let content = storage::download(file_name).await?;
 
     Ok((
         [

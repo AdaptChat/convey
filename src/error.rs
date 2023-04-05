@@ -18,6 +18,7 @@ pub enum Error {
     IllegalFilename,
     MultipartError(String),
     IOFailed(String),
+    S3Error(String),
     EncodingFailed,
     TooLarge,
     InvalidAvatarSize,
@@ -79,6 +80,13 @@ impl IntoResponse for Error {
                     message: Cow::Owned(format!("Error saving attachment: {e}")),
                 },
             ),
+            Self::S3Error(e) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorJson {
+                    code: 500,
+                    message: Cow::Owned(format!("s3 error: {e}")),
+                },
+            ),
             Self::TooLarge => (
                 StatusCode::PAYLOAD_TOO_LARGE,
                 ErrorJson {
@@ -130,6 +138,12 @@ impl From<std::io::Error> for Error {
             ErrorKind::NotFound => Self::NotFound,
             _ => Self::IOFailed(value.to_string()),
         }
+    }
+}
+
+impl From<s3::error::S3Error> for Error {
+    fn from(value: s3::error::S3Error) -> Self {
+        Self::S3Error(value.to_string())
     }
 }
 

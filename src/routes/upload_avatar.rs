@@ -1,16 +1,14 @@
-use std::fs::{self, File};
-
 use axum::{
     extract::{Multipart, Path},
     headers::{authorization::Bearer, Authorization},
     response::IntoResponse,
     Json, TypedHeader,
 };
-use uuid::Uuid;
 
 use crate::{
-    config::{AUTH, FILE_STORAGE_PATH},
+    config::AUTH,
     error::{Error, Result},
+    storage::{self},
 };
 
 use super::{extract_field, UploadInfo};
@@ -35,23 +33,11 @@ pub async fn upload_avatar(
             .1
             .to_string();
 
-        let id = Uuid::new_v4().to_string();
+        let file_name = format!("/avatars/{user_id}.{ext}");
 
-        let path = tokio::task::spawn_blocking(move || -> Result<String> {
-            let path = format!("{}/{user_id}", *FILE_STORAGE_PATH);
-            drop(fs::remove_dir_all(&path));
-            fs::create_dir(&path)?;
+        storage::upload(buffer, &file_name).await?;
 
-            let path = format!("{}/{user_id}/{id}.{ext}", *FILE_STORAGE_PATH);
-            let file = File::create(&path)?;
-
-            zstd::stream::copy_encode(&buffer[..], file, 15)?;
-
-            Ok(format!("/avatars/{user_id}/{id}.{ext}"))
-        })
-        .await??;
-
-        Ok(Json(UploadInfo { path }))
+        Ok(Json(UploadInfo { path: file_name }))
     } else {
         Err(Error::MissingField)
     }

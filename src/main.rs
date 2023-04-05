@@ -1,3 +1,5 @@
+#![feature(once_cell)]
+
 use axum::{
     extract::DefaultBodyLimit,
     routing::{get, post},
@@ -7,6 +9,7 @@ use axum::{
 mod config;
 mod error;
 mod routes;
+mod storage;
 
 #[tokio::main]
 async fn main() {
@@ -25,14 +28,18 @@ async fn main() {
             "/attachments/:id/*filename",
             get(routes::download).delete(routes::delete),
         )
-        .route("/avatars/:user_id", post(routes::upload_avatar))
+        .route(
+            "/avatars/:user_id",
+            post(routes::upload_avatar).get(routes::download_avatar),
+        )
         .route(
             "/avatars/:user_id/default.png",
             get(routes::download_default_avatar),
         )
-        .route("/avatars/:user_id/*id", get(routes::download_avatar))
-        .route("/icons/:id", post(routes::upload_avatar))
-        .route("/icons/:id/*uid", get(routes::download_avatar))
+        .route(
+            "/icons/:id",
+            post(routes::upload_avatar).get(routes::download_avatar),
+        )
         .layer(DefaultBodyLimit::max(1024 * 1024 * 20));
 
     axum::Server::bind(&"0.0.0.0:8078".parse().unwrap())

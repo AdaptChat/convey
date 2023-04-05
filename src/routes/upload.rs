@@ -1,5 +1,3 @@
-use std::fs::File;
-
 use axum::{
     extract::Multipart,
     headers::{authorization::Bearer, Authorization},
@@ -9,8 +7,9 @@ use axum::{
 use uuid::Uuid;
 
 use crate::{
-    config::{AUTH, FILE_STORAGE_PATH},
+    config::AUTH,
     error::{Error, Result},
+    storage,
 };
 
 use super::{extract_field, UploadInfo};
@@ -36,18 +35,11 @@ pub async fn upload(
         );
 
         let id = Uuid::new_v4().to_string();
+        let file_name = format!("/attachments/{id}/{file_name}");
 
-        let path = tokio::task::spawn_blocking(move || -> Result<String> {
-            let path = format!("{}/{id}-{file_name}", *FILE_STORAGE_PATH);
-            let file = File::create(&path)?;
+        storage::upload(buffer, &file_name).await?;
 
-            zstd::stream::copy_encode(&buffer[..], file, 15)?;
-
-            Ok(format!("/attachments/{id}/{file_name}"))
-        })
-        .await??;
-
-        Ok(Json(UploadInfo { path }))
+        Ok(Json(UploadInfo { path: file_name }))
     } else {
         Err(Error::MissingField)
     }
