@@ -10,6 +10,7 @@ pub fn get_s3_bucket() -> &'static Bucket {
     S3_BUCKET.get_or_init(|| {
         Bucket::new(&*S3_BUCKET_NAME, S3_REGION.clone(), S3_CREDENTIALS.clone())
             .expect("Failed to init S3 bucket")
+            .with_path_style()
     })
 }
 
