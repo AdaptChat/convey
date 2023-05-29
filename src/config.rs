@@ -19,6 +19,9 @@ lazy_static! {
     pub static ref MAX_SIZE: u64 = std::env::var("MAX_SIZE").map_or(1024 * 1024 * 10, |v| v
         .parse()
         .expect("Invalid input for MAX_SIZE, expected integer"));
+    pub static ref USE_ZSTD_AT: usize = std::env::var("USE_ZSTD_AT").map_or(20, |v| v
+        .parse()
+        .expect("Invalid input for USE_ZSTD_AT, expected integer"));
     pub static ref FILE_STORAGE_PATH: String =
         std::env::var("FILE_STORAGE_PATH").unwrap_or_else(|_| "./files".to_string());
     pub static ref S3_BUCKET_NAME: String = std::env::var("S3_BUCKET_NAME").unwrap_or_default();

@@ -29,7 +29,10 @@ pub async fn download(file_name: impl AsRef<str>) -> Result<Vec<u8>> {
 
     match resp.status_code() {
         200 => Ok(if file_name.contains("/compr") {
-            tokio::task::spawn_blocking(move || super::decompress(Into::<Vec<u8>>::into(resp).as_slice())).await??
+            tokio::task::spawn_blocking(move || {
+                super::decompress(Into::<Vec<u8>>::into(resp).as_slice())
+            })
+            .await??
         } else {
             resp.into()
         }),

@@ -7,7 +7,7 @@ use axum::{
 use uuid::Uuid;
 
 use crate::{
-    config::AUTH,
+    config::{AUTH, USE_ZSTD_AT},
     error::{Error, Result},
     storage,
 };
@@ -33,11 +33,11 @@ pub async fn upload(
                 replacement: "_",
             },
         );
-        let zstd = buffer.len() >= 20;
+        let zstd = buffer.len() >= *USE_ZSTD_AT;
         let id = Uuid::new_v4().to_string();
         let file_name = format!(
-            "/attachments/{id}{}/{file_name}",
-            if zstd { "/compr" } else { "" }
+            "/attachments/{}{id}/{file_name}",
+            if zstd { "compr/" } else { "" }
         );
 
         storage::upload(buffer, &file_name, zstd).await?;

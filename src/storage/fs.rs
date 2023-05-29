@@ -1,6 +1,6 @@
 use std::fs::File;
 
-use std::io::{Write, Read};
+use std::io::{Read, Write};
 use std::path::Path;
 
 use crate::config::FILE_STORAGE_PATH;
@@ -33,12 +33,12 @@ pub async fn download(file_name: impl ToString) -> Result<Vec<u8>> {
 
         Ok(if file_name.contains("/compr") {
             zstd::stream::decode_all(file)?
-    } else {
-        let mut buf = vec![];
-        file.read_to_end(&mut buf)?;
+        } else {
+            let mut buf = vec![];
+            file.read_to_end(&mut buf)?;
 
-        buf
-    })
+            buf
+        })
     })
     .await?
 }

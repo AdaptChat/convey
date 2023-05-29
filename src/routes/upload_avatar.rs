@@ -6,7 +6,7 @@ use axum::{
 };
 
 use crate::{
-    config::AUTH,
+    config::{AUTH, USE_ZSTD_AT},
     error::{Error, Result},
     storage::{self},
 };
@@ -33,8 +33,11 @@ pub async fn upload_avatar(
             .1
             .to_string();
 
-        let zstd = buffer.len() >= 20;
-        let file_name = format!("/avatars/{}{user_id}.{ext}", if zstd { "compr/" } else { "" });
+        let zstd = buffer.len() >= *USE_ZSTD_AT;
+        let file_name = format!(
+            "/avatars/{}{user_id}.{ext}",
+            if zstd { "compr/" } else { "" }
+        );
 
         storage::upload(buffer, &file_name, zstd).await?;
 
