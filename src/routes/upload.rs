@@ -33,11 +33,14 @@ pub async fn upload(
                 replacement: "_",
             },
         );
-
+        let zstd = buffer.len() >= 20;
         let id = Uuid::new_v4().to_string();
-        let file_name = format!("/attachments/{id}/{file_name}");
+        let file_name = format!(
+            "/attachments/{id}{}/{file_name}",
+            if zstd { "/compr" } else { "" }
+        );
 
-        storage::upload(buffer, &file_name).await?;
+        storage::upload(buffer, &file_name, zstd).await?;
 
         Ok(Json(UploadInfo { path: file_name }))
     } else {

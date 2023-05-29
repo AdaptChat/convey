@@ -13,11 +13,19 @@ pub fn compress_to(from: impl Read, to: impl Write) -> Result<()> {
     zstd::stream::copy_encode(from, to, 15).map_err(Into::into)
 }
 
-pub async fn upload(buffer: Vec<u8>, file_name: impl AsRef<str>) -> Result<()> {
+pub fn decompress(from: impl Read) -> Result<Vec<u8>> {
+    zstd::stream::decode_all(from).map_err(Into::into)
+}
+
+pub fn decompress_to(from: impl Read, to: impl Write) -> Result<()> {
+    zstd::stream::copy_decode(from, to).map_err(Into::into)
+}
+
+pub async fn upload(buffer: Vec<u8>, file_name: impl AsRef<str>, zstd: bool) -> Result<()> {
     if *S3 {
-        s3::upload(buffer, file_name).await
+        s3::upload(buffer, file_name, zstd).await
     } else {
-        fs::upload(buffer, file_name.as_ref()).await
+        fs::upload(buffer, file_name.as_ref(), zstd).await
     }
 }
 

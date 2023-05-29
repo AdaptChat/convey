@@ -1,18 +1,23 @@
 use std::fs::File;
 
+use std::io::{Write, Read};
 use std::path::Path;
 
 use crate::config::FILE_STORAGE_PATH;
 use crate::error::Result;
 
-pub async fn upload(buffer: Vec<u8>, file_name: impl ToString) -> Result<()> {
+pub async fn upload(buffer: Vec<u8>, file_name: impl ToString, zstd: bool) -> Result<()> {
     let file_name = file_name.to_string();
 
     tokio::task::spawn_blocking(move || -> Result<()> {
         let path = format!("{}{}", *FILE_STORAGE_PATH, file_name);
-        let file = File::create(&path)?;
+        let mut file = File::create(&path)?;
 
-        super::compress_to(&buffer[..], file)?;
+        if zstd {
+            super::compress_to(&buffer[..], file)?;
+        } else {
+            file.write_all(&buffer)?;
+        }
 
         Ok(())
     })
@@ -23,10 +28,17 @@ pub async fn download(file_name: impl ToString) -> Result<Vec<u8>> {
     let file_name = file_name.to_string();
 
     tokio::task::spawn_blocking(move || -> Result<Vec<u8>> {
-        let file =
+        let mut file =
             std::fs::File::open(format!("{}/{}", *FILE_STORAGE_PATH, file_name.to_string()))?;
 
-        Ok(zstd::stream::decode_all(file)?)
+        Ok(if file_name.contains("/compr") {
+            zstd::stream::decode_all(file)?
+    } else {
+        let mut buf = vec![];
+        file.read_to_end(&mut buf)?;
+
+        buf
+    })
     })
     .await?
 }

@@ -33,9 +33,10 @@ pub async fn upload_avatar(
             .1
             .to_string();
 
-        let file_name = format!("/avatars/{user_id}.{ext}");
+        let zstd = buffer.len() >= 20;
+        let file_name = format!("/avatars/{}{user_id}.{ext}", if zstd { "compr/" } else { "" });
 
-        storage::upload(buffer, &file_name).await?;
+        storage::upload(buffer, &file_name, zstd).await?;
 
         Ok(Json(UploadInfo { path: file_name }))
     } else {
