@@ -12,7 +12,13 @@ use crate::{
     storage,
 };
 
-use super::{extract_field, UploadInfo};
+use super::extract_field;
+
+#[derive(Serialize)]
+pub struct AttachmentUploadInfo {
+    id: Uuid,
+    path: String,
+}
 
 pub async fn upload(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,
@@ -42,7 +48,7 @@ pub async fn upload(
 
         storage::upload(buffer, &file_name, zstd).await?;
 
-        Ok(Json(UploadInfo { id, path: file_name }))
+        Ok(Json(AttachmentUploadInfo { id, path: file_name }))
     } else {
         Err(Error::MissingField)
     }
