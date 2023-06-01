@@ -34,7 +34,7 @@ pub async fn upload(
             },
         );
         let zstd = buffer.len() >= *USE_ZSTD_AT;
-        let id = Uuid::new_v4().to_string();
+        let id = Uuid::new_v4();
         let file_name = format!(
             "/attachments/{}{id}/{file_name}",
             if zstd { "compr/" } else { "" }
@@ -42,7 +42,7 @@ pub async fn upload(
 
         storage::upload(buffer, &file_name, zstd).await?;
 
-        Ok(Json(UploadInfo { path: file_name }))
+        Ok(Json(UploadInfo { id, path: file_name }))
     } else {
         Err(Error::MissingField)
     }

@@ -6,6 +6,7 @@ mod upload;
 mod upload_avatar;
 
 use axum::extract::multipart::Field;
+use uuid::Uuid;
 pub use delete::delete;
 pub use download::download;
 pub use download_avatar::download_avatar;
@@ -22,6 +23,7 @@ use crate::{
 
 #[derive(Serialize)]
 pub struct UploadInfo {
+    id: Uuid,
     path: String,
 }
 
