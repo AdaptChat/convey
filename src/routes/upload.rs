@@ -4,6 +4,7 @@ use axum::{
     response::IntoResponse,
     Json, TypedHeader,
 };
+use serde::Serialize;
 use uuid::Uuid;
 
 use crate::{

@@ -4,6 +4,7 @@ use axum::{
     response::IntoResponse,
     Json, TypedHeader,
 };
+use serde::Serialize;
 
 use crate::{
     config::{AUTH, USE_ZSTD_AT},
@@ -15,7 +16,6 @@ use super::extract_field;
 
 #[derive(Serialize)]
 pub struct AvatarUploadInfo {
-    id: Uuid,
     path: String,
 }
 
