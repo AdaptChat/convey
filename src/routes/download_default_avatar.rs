@@ -1,5 +1,4 @@
 use axum::{
-    extract::{Path, Query},
     http::header,
     response::IntoResponse,
 };
@@ -42,8 +41,8 @@ pub struct DefaultAvatarQuery {
 }
 
 pub async fn download_default_avatar(
-    Path(user_id): Path<String>,
-    Query(query): Query<DefaultAvatarQuery>,
+    user_id: String,
+    query: DefaultAvatarQuery,
 ) -> Result<impl IntoResponse> {
     if !(64..=512).contains(&query.size) {
         return Err(Error::InvalidAvatarSize);

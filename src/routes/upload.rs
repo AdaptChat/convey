@@ -49,7 +49,10 @@ pub async fn upload(
 
         storage::upload(buffer, &file_name, zstd).await?;
 
-        Ok(Json(AttachmentUploadInfo { id, path: file_name }))
+        Ok(Json(AttachmentUploadInfo {
+            id,
+            path: file_name,
+        }))
     } else {
         Err(Error::MissingField)
     }

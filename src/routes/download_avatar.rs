@@ -1,8 +1,27 @@
-use axum::{extract::Path, http::header, response::IntoResponse};
+use axum::{
+    extract::{Path, Query},
+    http::header,
+    response::IntoResponse,
+};
 
-use crate::{error::Result, storage};
+use crate::{
+    error::{Error, Result},
+    storage,
+};
 
-pub async fn download_avatar(Path(mut filename): Path<String>) -> Result<impl IntoResponse> {
+use super::download_default_avatar::DefaultAvatarQuery;
+
+pub async fn download_avatar(
+    Path(mut filename): Path<String>,
+    Query(query): Query<DefaultAvatarQuery>,
+) -> Result<impl IntoResponse> {
+    if filename.ends_with("default.png") {
+        let user_id = filename.rsplit('/').nth(1).ok_or(Error::NotFound)?;
+        return Ok(super::download_default_avatar(user_id.to_string(), query)
+            .await?
+            .into_response());
+    }
+
     super::remove_compr(&mut filename);
     let content = storage::download(format!("/avatars/{filename}")).await?;
 
@@ -15,5 +34,6 @@ pub async fn download_avatar(Path(mut filename): Path<String>) -> Result<impl In
             ),
         ],
         content,
-    ))
+    )
+        .into_response())
 }
