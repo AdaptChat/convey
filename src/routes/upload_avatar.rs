@@ -4,6 +4,7 @@ use axum::{
     response::IntoResponse,
     Json, TypedHeader,
 };
+use serde::Serialize;
 
 use crate::{
     config::{AUTH, USE_ZSTD_AT},
@@ -11,7 +12,12 @@ use crate::{
     storage::{self},
 };
 
-use super::{extract_field, UploadInfo};
+use super::extract_field;
+
+#[derive(Serialize)]
+pub struct AvatarUploadInfo {
+    path: String,
+}
 
 pub async fn upload_avatar(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,
@@ -41,7 +47,7 @@ pub async fn upload_avatar(
 
         storage::upload(buffer, &file_name, zstd).await?;
 
-        Ok(Json(UploadInfo { path: file_name }))
+        Ok(Json(AvatarUploadInfo { path: file_name }))
     } else {
         Err(Error::MissingField)
     }

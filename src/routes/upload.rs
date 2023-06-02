@@ -4,6 +4,7 @@ use axum::{
     response::IntoResponse,
     Json, TypedHeader,
 };
+use serde::Serialize;
 use uuid::Uuid;
 
 use crate::{
@@ -12,7 +13,13 @@ use crate::{
     storage,
 };
 
-use super::{extract_field, UploadInfo};
+use super::extract_field;
+
+#[derive(Serialize)]
+pub struct AttachmentUploadInfo {
+    id: Uuid,
+    path: String,
+}
 
 pub async fn upload(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,
@@ -34,7 +41,7 @@ pub async fn upload(
             },
         );
         let zstd = buffer.len() >= *USE_ZSTD_AT;
-        let id = Uuid::new_v4().to_string();
+        let id = Uuid::new_v4();
         let file_name = format!(
             "/attachments/{}{id}/{file_name}",
             if zstd { "compr/" } else { "" }
@@ -42,7 +49,7 @@ pub async fn upload(
 
         storage::upload(buffer, &file_name, zstd).await?;
 
-        Ok(Json(UploadInfo { path: file_name }))
+        Ok(Json(AttachmentUploadInfo { id, path: file_name }))
     } else {
         Err(Error::MissingField)
     }

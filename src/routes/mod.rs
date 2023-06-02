@@ -13,17 +13,10 @@ pub use download_default_avatar::download_default_avatar;
 pub use upload::upload;
 pub use upload_avatar::upload_avatar;
 
-use serde::Serialize;
-
 use crate::{
     config::MAX_SIZE,
     error::{Error, Result},
 };
-
-#[derive(Serialize)]
-pub struct UploadInfo {
-    path: String,
-}
 
 pub fn remove_compr(filename: &mut String) {
     filename.remove_matches("/compr");
