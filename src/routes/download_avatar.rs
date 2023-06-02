@@ -2,8 +2,9 @@ use axum::{extract::Path, http::header, response::IntoResponse};
 
 use crate::{error::Result, storage};
 
-pub async fn download_avatar(Path(user_id): Path<String>) -> Result<impl IntoResponse> {
-    let content = storage::download(format!("/avatars/{user_id}")).await?;
+pub async fn download_avatar(Path(mut filename): Path<String>) -> Result<impl IntoResponse> {
+    super::remove_compr(&mut filename);
+    let content = storage::download(format!("/avatars/{filename}")).await?;
 
     Ok((
         [

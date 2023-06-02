@@ -2,9 +2,11 @@ use axum::{extract::Path, http::header, response::IntoResponse};
 
 use crate::{error::Result, storage};
 
-pub async fn download(Path((id, file_name)): Path<(String, String)>) -> Result<impl IntoResponse> {
-    let file_name = format!("/attachments/{id}/{file_name}");
-    let content = storage::download(file_name).await?;
+pub async fn download(Path(mut filename): Path<String>) -> Result<impl IntoResponse> {
+    super::remove_compr(&mut filename);
+    let filename = format!("/attachments/{filename}");
+
+    let content = storage::download(filename).await?;
 
     Ok((
         [

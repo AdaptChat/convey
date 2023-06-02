@@ -25,6 +25,10 @@ pub struct UploadInfo {
     path: String,
 }
 
+pub fn remove_compr(filename: &mut String) {
+    filename.remove_matches("/compr");
+}
+
 pub async fn extract_field(field: &mut Field<'_>) -> Result<Vec<u8>> {
     let mut current_size = 0_u64;
     let mut buffer = Vec::with_capacity(1024 * 1024 * 3);

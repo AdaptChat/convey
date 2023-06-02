@@ -13,14 +13,15 @@ use crate::{
 
 pub async fn delete(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,
-    Path((id, file_name)): Path<(String, String)>,
+    Path(mut filename): Path<String>,
 ) -> Result<impl IntoResponse> {
     if auth.token() != *AUTH {
         return Err(Error::NotAuthorized);
     }
+    super::remove_compr(&mut filename);
 
-    let file_name = format!("/attachments/{id}/{file_name}");
-    storage::remove(file_name).await?;
+    let filename = format!("/attachments/{}", filename);
+    storage::remove(filename).await?;
 
     Ok(())
 }

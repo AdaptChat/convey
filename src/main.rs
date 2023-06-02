@@ -1,4 +1,4 @@
-#![feature(once_cell)]
+#![feature(string_remove_matches)]
 
 use axum::{
     extract::DefaultBodyLimit,
@@ -25,11 +25,11 @@ async fn main() {
         .route("/", get(|| async { "Hello, World!" }))
         .route("/attachments", post(routes::upload))
         .route(
-            "/attachments/:id/*filename",
+            "/attachments/*filename",
             get(routes::download).delete(routes::delete),
         )
         .route(
-            "/avatars/:user_id",
+            "/avatars/*filename",
             post(routes::upload_avatar).get(routes::download_avatar),
         )
         .route(
