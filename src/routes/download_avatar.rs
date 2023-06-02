@@ -12,7 +12,7 @@ use crate::{
 use super::download_default_avatar::DefaultAvatarQuery;
 
 pub async fn download_avatar(
-    Path(mut filename): Path<String>,
+    Path(filename): Path<String>,
     Query(query): Query<DefaultAvatarQuery>,
 ) -> Result<impl IntoResponse> {
     if filename.ends_with("default.png") {
@@ -22,7 +22,6 @@ pub async fn download_avatar(
             .into_response());
     }
 
-    super::remove_compr(&mut filename);
     let content = storage::download(format!("/avatars/{filename}")).await?;
 
     Ok((
