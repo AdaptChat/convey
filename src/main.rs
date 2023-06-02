@@ -29,12 +29,12 @@ async fn main() {
             get(routes::download).delete(routes::delete),
         )
         .route(
-            "/avatars/*filename",
-            post(routes::upload_avatar).get(routes::download_avatar),
-        )
-        .route(
             "/avatars/:user_id/default.png",
             get(routes::download_default_avatar),
+        )
+        .route(
+            "/avatars/*filename",
+            post(routes::upload_avatar).get(routes::download_avatar),
         )
         .route(
             "/icons/:id",
