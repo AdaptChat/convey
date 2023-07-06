@@ -10,12 +10,13 @@ edition = "2021"
 axum = { version = "0.6", features = ["headers", "json", "multipart"] }
 dotenv = "0"
 lazy_static = "1"
-pretty_env_logger = "0.4"
+pretty_env_logger = "0.5"
 rdenticon = "0.1"
-rust-s3 = "0.32"
+rust-s3 = "0.33"
 sanitize-filename = "0.4"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "fs"] }
+tower-http = { version = "0.4", features = ["fs"] }
 tree_magic_mini = "3"
 uuid = { version = "1", features = ["v4", "fast-rng", "serde"] }
 zstd = "0.12"
