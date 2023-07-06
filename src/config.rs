@@ -26,7 +26,7 @@ lazy_static! {
         std::env::var("FILE_STORAGE_PATH").unwrap_or_else(|_| "./files".to_string());
     pub static ref ASSETS_PATH: PathBuf = std::env::var("ASSETS_PATH")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| PathBuf::from("./assets"));
+        .unwrap_or_else(|_| PathBuf::from("assets"));
     pub static ref S3_BUCKET_NAME: String = std::env::var("S3_BUCKET_NAME").unwrap_or_default();
     pub static ref S3_REGION: Region = Region::Custom {
         region: std::env::var("S3_REGION").unwrap_or_default(),

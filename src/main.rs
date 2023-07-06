@@ -38,7 +38,7 @@ async fn main() {
             "/icons/:id",
             post(routes::upload_avatar).get(routes::download_avatar),
         )
-        .route_service("/assets", ServeDir::new(&*ASSETS_PATH))
+        .route_service("/assets/*", ServeDir::new(&*ASSETS_PATH))
         .layer(DefaultBodyLimit::max(1024 * 1024 * 20));
 
     axum::Server::bind(&"0.0.0.0:8078".parse().unwrap())
