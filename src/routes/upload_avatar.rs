@@ -5,6 +5,7 @@ use axum::{
     Json, TypedHeader,
 };
 use serde::Serialize;
+use uuid::Uuid;
 
 use crate::{
     config::{AUTH, USE_ZSTD_AT},
@@ -40,8 +41,9 @@ pub async fn upload_avatar(
             .to_string();
 
         let zstd = buffer.len() >= *USE_ZSTD_AT;
+        let id = Uuid::new_v4();
         let file_name = format!(
-            "/avatars/{}{user_id}.{ext}",
+            "/avatars/{}{user_id}/{id}.{ext}",
             if zstd { "compr/" } else { "" }
         );
 
