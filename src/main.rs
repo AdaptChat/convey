@@ -38,6 +38,12 @@ async fn main() {
             "/icons/:id",
             post(routes::upload_avatar).get(routes::download_avatar),
         )
+        .route(
+            "/emoji/:guild_id/:name",
+            post(routes::upload_emoji)
+                .get(routes::download_emoji)
+                .delete(routes::delete_emoji),
+        )
         .fallback_service(ServeDir::new(&*ASSETS_PATH))
         .layer(DefaultBodyLimit::max(1024 * 1024 * 20));
 

@@ -1,4 +1,4 @@
-use std::{sync::OnceLock, path::PathBuf};
+use std::{path::PathBuf, sync::OnceLock};
 
 use lazy_static::lazy_static;
 use s3::{creds::Credentials, Bucket, Region};
@@ -24,8 +24,8 @@ lazy_static! {
         .expect("Invalid input for USE_ZSTD_AT, expected integer"));
     pub static ref FILE_STORAGE_PATH: String =
         std::env::var("FILE_STORAGE_PATH").unwrap_or_else(|_| "./files".to_string());
-    pub static ref ASSETS_PATH: String = std::env::var("ASSETS_PATH")
-        .unwrap_or_else(|_| "assets".to_string());
+    pub static ref ASSETS_PATH: String =
+        std::env::var("ASSETS_PATH").unwrap_or_else(|_| "assets".to_string());
     pub static ref S3_BUCKET_NAME: String = std::env::var("S3_BUCKET_NAME").unwrap_or_default();
     pub static ref S3_REGION: Region = Region::Custom {
         region: std::env::var("S3_REGION").unwrap_or_default(),

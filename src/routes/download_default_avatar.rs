@@ -1,7 +1,4 @@
-use axum::{
-    http::header,
-    response::IntoResponse,
-};
+use axum::{http::header, response::IntoResponse};
 use rdenticon::{ImageFormat, Rgba};
 use serde::Deserialize;
 
