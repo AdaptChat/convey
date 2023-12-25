@@ -16,13 +16,13 @@ use super::extract_field_custom_max;
 
 #[derive(Serialize)]
 struct EmojiUploadInfo {
-    name: String,
+    id: u64,
     path: String,
 }
 
 pub async fn upload_emoji(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,
-    Path((guild, name)): Path<(u64, String)>,
+    Path(id): Path<u64>,
     mut multipart: Multipart,
 ) -> Result<impl IntoResponse> {
     if auth.token() != *AUTH {
@@ -32,21 +32,11 @@ pub async fn upload_emoji(
     if let Ok(Some(mut field)) = multipart.next_field().await {
         let buffer = extract_field_custom_max(&mut field, 1024 * 512).await?;
 
-        if !sanitize_filename::is_sanitized_with_options(
-            &name,
-            sanitize_filename::OptionsForCheck {
-                windows: false,
-                truncate: true,
-            },
-        ) {
-            return Err(Error::IllegalFilename);
-        }
-
-        let file_name = format!("/emoji/{guild}/{name}");
+        let file_name = format!("/emoji/{id}");
         storage::upload(buffer, &file_name, false).await?;
 
         Ok(Json(EmojiUploadInfo {
-            name,
+            id,
             path: file_name,
         }))
     } else {

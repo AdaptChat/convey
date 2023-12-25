@@ -13,13 +13,13 @@ use crate::{
 
 pub async fn delete_emoji(
     TypedHeader(Authorization(auth)): TypedHeader<Authorization<Bearer>>,
-    Path((guild, name)): Path<(u64, String)>,
+    Path(id): Path<u64>,
 ) -> Result<impl IntoResponse> {
     if auth.token() != *AUTH {
         return Err(Error::NotAuthorized);
     }
 
-    let filename = format!("/emoji/{guild}/{name}");
+    let filename = format!("/emoji/{id}");
     storage::remove(filename).await?;
 
     Ok(())

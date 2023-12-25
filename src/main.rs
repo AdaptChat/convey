@@ -39,7 +39,7 @@ async fn main() {
             post(routes::upload_avatar).get(routes::download_avatar),
         )
         .route(
-            "/emoji/:guild_id/:name",
+            "/emojis/:id",
             post(routes::upload_emoji)
                 .get(routes::download_emoji)
                 .delete(routes::delete_emoji),

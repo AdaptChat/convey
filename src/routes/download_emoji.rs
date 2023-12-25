@@ -2,8 +2,8 @@ use axum::{extract::Path, http::header, response::IntoResponse};
 
 use crate::{error::Result, storage};
 
-pub async fn download_emoji(Path((guild, name)): Path<(u64, String)>) -> Result<impl IntoResponse> {
-    let content = storage::download(format!("/emoji/{guild}/{name}")).await?;
+pub async fn download_emoji(Path(id): Path<u64>) -> Result<impl IntoResponse> {
+    let content = storage::download(format!("/emoji/{id}")).await?;
 
     Ok((
         [
