@@ -47,8 +47,8 @@ pub async fn upload_avatar(
             if zstd { "compr/" } else { "" }
         );
 
-        let _ = storage::remove("/avatars/compr/{user_id}").await;
-        let _ = storage::remove("/avatars/{user_id}").await;
+        let _ = storage::remove(format!("/avatars/compr/{user_id}")).await;
+        let _ = storage::remove(format!("/avatars/{user_id}")).await;
 
         storage::upload(buffer, &file_name, zstd).await?;
 
