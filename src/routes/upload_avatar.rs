@@ -3,7 +3,10 @@ use axum::{
     response::IntoResponse,
     Json,
 };
-use axum_extra::{TypedHeader, headers::{authorization::Bearer, Authorization}};
+use axum_extra::{
+    headers::{authorization::Bearer, Authorization},
+    TypedHeader,
+};
 use serde::Serialize;
 use uuid::Uuid;
 

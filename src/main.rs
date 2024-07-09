@@ -1,13 +1,13 @@
 #![feature(string_remove_matches)]
 
-use std::net::SocketAddr;
 use axum::{
     extract::DefaultBodyLimit,
     routing::{get, post},
     Router,
 };
-use tokio::net::TcpListener;
 use config::ASSETS_PATH;
+use std::net::SocketAddr;
+use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
 
 mod config;
@@ -20,7 +20,9 @@ async fn main() {
     drop(dotenv::dotenv());
 
     if std::env::var("RUST_LOG").is_err() {
-        unsafe { std::env::set_var("RUST_LOG", "info"); }
+        unsafe {
+            std::env::set_var("RUST_LOG", "info");
+        }
     }
 
     pretty_env_logger::init();

@@ -1,8 +1,8 @@
-use axum::{
-    extract::Path,
-    response::IntoResponse,
+use axum::{extract::Path, response::IntoResponse};
+use axum_extra::{
+    headers::{authorization::Bearer, Authorization},
+    TypedHeader,
 };
-use axum_extra::{TypedHeader, headers::{authorization::Bearer, Authorization}};
 
 use crate::{
     config::AUTH,
