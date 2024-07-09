@@ -18,7 +18,7 @@ async fn main() {
     drop(dotenv::dotenv());
 
     if std::env::var("RUST_LOG").is_err() {
-        std::env::set_var("RUST_LOG", "info");
+        unsafe { std::env::set_var("RUST_LOG", "info"); }
     }
 
     pretty_env_logger::init();
@@ -36,6 +36,10 @@ async fn main() {
         )
         .route(
             "/icons/:id",
+            post(routes::upload_avatar).get(routes::download_avatar),
+        )
+        .route(
+            "/banners/:id",
             post(routes::upload_avatar).get(routes::download_avatar),
         )
         .route(
