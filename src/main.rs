@@ -1,10 +1,12 @@
 #![feature(string_remove_matches)]
 
+use std::net::SocketAddr;
 use axum::{
     extract::DefaultBodyLimit,
     routing::{get, post},
     Router,
 };
+use tokio::net::TcpListener;
 use config::ASSETS_PATH;
 use tower_http::services::ServeDir;
 
@@ -51,8 +53,10 @@ async fn main() {
         .fallback_service(ServeDir::new(&*ASSETS_PATH))
         .layer(DefaultBodyLimit::max(1024 * 1024 * 20));
 
-    axum::Server::bind(&"0.0.0.0:8078".parse().unwrap())
-        .serve(app.into_make_service())
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8078));
+    let listener = TcpListener::bind(addr).await.unwrap();
+
+    axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(async { drop(tokio::signal::ctrl_c().await) })
         .await
         .unwrap();

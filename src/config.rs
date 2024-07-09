@@ -1,4 +1,4 @@
-use std::{path::PathBuf, sync::OnceLock};
+use std::sync::OnceLock;
 
 use lazy_static::lazy_static;
 use s3::{creds::Credentials, Bucket, Region};

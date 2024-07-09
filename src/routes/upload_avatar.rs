@@ -1,9 +1,9 @@
 use axum::{
     extract::{Multipart, Path},
-    headers::{authorization::Bearer, Authorization},
     response::IntoResponse,
-    Json, TypedHeader,
+    Json,
 };
+use axum_extra::{TypedHeader, headers::{authorization::Bearer, Authorization}};
 use serde::Serialize;
 use uuid::Uuid;
 
